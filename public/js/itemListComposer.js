@@ -32,6 +32,8 @@
 
 			var lastSelected;	//for shift-click range selection
 
+			var enteredItem = false;
+
 			//initializing:
 			//sorting itemsSource
 			itemsSource.append(itemsSource.find(settings.item).sort(function(a, b) {
@@ -39,12 +41,11 @@
 			}));
 
 			// selectinging by click
-			//TODO: add ability to select range with SHIFT
 			itemsSource.add(itemReceivers).find(settings.item).click(function(e){
 				if(e.shiftKey && undefined != lastSelected) {
 					var lower = Math.min($(this).index(),lastSelected.index());
-
-					var items = $(this).siblings().slice(lower, Math.max($(this).index(),lastSelected.index()) );
+					var upper = Math.max($(this).index(),lastSelected.index());
+					var items = $(this).siblings().slice(lower, upper);
 					items.add(this).addClass(settings.selectedClass);
 				}
 				else {
@@ -52,28 +53,38 @@
 				}
 				lastSelected = $(this);
 			}).on('dragstart', function(){
-				console.log('drag started');
+				
 			}).on('dragend', function(){
-				//removeAcceptors();
+				removeAcceptors();
 			});
 
+			// TODO: make different behaviour objects for itemSource item and itemReceivers item
+			// so we can swap item behavior easily when moved from one container to another
+
 			itemReceivers.on('dragover', function(){
-				$(this).find(settings.item).last().next(newAcceptor());
 			}).on('dragleave', function(e){
-				if(e.target === this) {
-					console.log(e.target)
+				if(!enteredItem) {
 					removeAcceptors();
+				}
+				enteredItem = false;
+			}).on('dragenter', function(e){
+				enteredItem = true;
+				if(e.target === this) {
+					var last = $(this).find(settings.item).last();
+					if( !last.hasClass(settings.acceptorClass) ) {
+						last.after(newAcceptor());
+					}
 				}
 			});
 
 			itemReceivers.find(settings.item).on('dragover', function(e){
 				var mouseY = (event.pageY - $(this).offset().top);
-				if(mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
-					$(this).siblings('.'+settings.acceptorClass).remove();
+				if (mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
+					removeAcceptors();
 					$(this).before(newAcceptor());
 				}
-				else {
-					$(this).siblings('.'+settings.acceptorClass).remove();
+				else if (mouseY > $(this).outerHeight() / 2 && !$(this).next().hasClass(settings.acceptorClass)){
+					removeAcceptors();
 					$(this).after(newAcceptor());
 				}
 			});
