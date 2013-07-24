@@ -1,0 +1,263 @@
+// You can call the complete framework, but if only using certain 
+// features just call them individually (will improve compilation speed)
+// @import "compass";
+
+// Only using clearfix so lets call that
+@import "compass";
+
+// Demo: Replace with your styles
+
+html {
+	font-family: Arial, Helvetica, serif;
+	font-size: 15px;
+	color: #333;
+}
+
+body {
+	padding: 20px;
+}
+
+.nav {
+
+	@include clearfix;
+	padding: 0;
+	list-style: none;
+
+	> li {
+
+		float: left;
+		
+		> a {
+			background-color: #2F2F2F;
+			color: #fff;
+			border-left:1px solid #fff;
+			padding: 10px 15px;
+			display: inline-block;
+		}
+		
+		&:first-child > a {
+			border-left:none;
+		}
+		
+		&.current > a {
+			background-color: #4F4F4F;
+		}
+	}
+}
+
+.btn {
+	color: #fff;
+	padding: 10px 15px;
+	background-color: #2F2F2F;
+	display: inline-block;
+	margin-top: 5px;
+}
+
+$bg: #f8f8f8;
+$red: #d93f20;
+$green: #8fb717;
+
+$text: #313131;
+$deeper-grey: #555;
+$deep-grey: #8b8b8b;
+$base-grey: #c1c1c1;
+$light-grey: #dbdbdb;
+$lighter-grey: #dee1e3;
+$white: #fff;
+// old (admitad-hq)
+// $deep-grey: #313131;
+// $grey: #555;
+// $light-grey: #c1c1c1;
+// $lighter-grey: #eee;
+
+//brand colors
+$deepest-violet: #4b0166;
+$deeper-violet: #580176;
+$deep-violet: #78169c;
+$base-violet: #8728aa;
+$light-violet: #9a5faf;
+$lighter-violet: #bb78d4;
+$lightest-violet: #d7b0e5;
+
+
+$deep-blue: #0469af;
+$blue: #1178b9;
+$light-blue: #4089c3;
+$lighter-blue: #74b1dc;
+
+$deep-yellow: #e27d1b;
+$yellow: #fcba47;
+$light-yellow: #ffc868;
+$lighter-yellow: #fff7e8;
+
+.double-list {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	margin-bottom: 2.7em;
+	padding-top: 1.4em + .3em;
+	.sortable,
+	.actions {
+		display: table-cell;
+	}
+	.sortable {
+		width: 50%;
+		list-style: none;
+		.title {
+			color: $deeper-grey;
+			font-weight: bold;
+			margin-bottom: .3em;
+		}
+		[draggable="true"] {
+			cursor: move;
+			&:hover {
+				background: darken($white, 7%);
+			}
+		}
+		.list {
+			margin: 0;
+			padding: 0;
+			height: 25em;
+			overflow-y: auto;
+			overflow-x: hidden;
+			list-style: none;
+			border: 1px solid $light-grey;
+			li {
+				border-top: 1px solid darken($white, 5%);
+				padding: 0 1em;
+				height: 2em;
+				line-height: 2em;
+				&:first-child {
+					border-top: none;
+				}
+			}
+			.checked {
+				background: $lightest-violet;
+				border-top-color: $lightest-violet;
+				font-weight: bold;
+			}
+		}
+	}
+	.actions {
+		vertical-align: middle;
+		list-style: none;
+		.action {
+			width: 100%;
+			text-align: left;
+			line-height: 1.4;
+			margin: 0;
+			&::-moz-focus-inner {
+				padding: 0 !important;
+				border: 0 !important;
+				//fix for ff extra padding
+			}
+		}
+		li {
+			margin-top: .4em;
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+		$arrow-size: .45em;
+		padding: 0 .83em;
+		&.move {
+			width: 10em - 0.83em * 2;
+			.move-right:before,
+			.move-right-all:before,
+			.move-right-all:after,
+			.move-left:before,
+			.move-left-all:before,
+			.move-left-all:after {
+				content: '';
+				display: inline-block;
+				border: $arrow-size solid transparent;
+				-moz-border-right-colors: rgba(0, 0, 0, 0);
+				border-right-width: 0;
+				border-left-color: $deep-grey;
+				margin-left: ($arrow-size / 2);
+				text-align: center;
+				margin-right: .6em + $arrow-size / 2;
+				float: left;
+				margin-top: (1.4em - $arrow-size * 2)/2;
+			}
+			.move-right-all:before,
+			.move-right-all:after,
+			.move-left-all:before,
+			.move-left-all:after {
+				margin-left: 0;
+				margin-right: .6em;
+			}
+			.move-right-all:before,
+			.move-left-all:before {
+				margin-right: 0;
+			}
+			.move-left:before,
+			.move-left-all:before,
+			.move-left-all:after {
+				border: $arrow-size solid transparent;
+				border-left-width: 0;
+				border-right-color: $deep-grey;
+			}
+		}
+		&.order {
+			width: 1px;
+			.action {
+				width: 1.8em;
+				height: 2em;
+				padding: .2em .45em .3em .45em;
+				&:before {
+					height: 2em * 1.5;
+				}
+			}
+			.order-up:before,
+			.order-up:after,
+			.order-down:before,
+			.order-down:after {
+				content: '';
+				display: block;
+				border: $arrow-size solid transparent;
+				-moz-border-right-colors: rgba(0, 0, 0, 0);
+				border-top-width: 0;
+				border-bottom-color: $deep-grey;
+				text-align: center;
+				width: 0;
+				height: 0;
+			}
+			.order-down:before,
+			.order-down:after {
+				border: $arrow-size solid transparent;
+				border-bottom-width: 0;
+				border-top-color: $deep-grey;
+			}
+		}
+	}
+	.action {
+		font-size: .9em;
+		color: $deeper-grey;
+		border:1px solid #c1c1c1;
+		padding: .2em .55em .3em .55em;
+		@include background-image(linear-gradient($white, darken($white, 13%)));
+		.lt-ie9 & {
+			@include filter-gradient($white, darken($white, 13%));
+		}
+		&::-moz-focus-inner {
+			padding: 0;
+		}
+		&:hover {
+			@include background-image(linear-gradient($white, darken($white, 7%)));
+			.lt-ie9 & {
+				@include filter-gradient($white, darken($white, 7%));
+			}
+		}
+		&:active {
+			padding: .3em .55em .2em .55em;
+			@include background-image(linear-gradient(darken($white, 10%), darken($white, 14%)));
+			.lt-ie9 & {
+				@include filter-gradient(darken($white, 10%), darken($white, 14%));
+			}
+		}
+	}
+	.acceptor {
+		background: red;
+	}
+}

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}Mixture + Compass{% endblock %}</title>
+        {{ "your-project.css" | asset_url | stylesheet_tag }}
+        <!-- TODO: Complete this project :) -->
+    </head>
+    <body class="wrapper">
+        {% include "navigation" %}
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        {{ "itemListComposer.js" | asset_url | script_tag }}
+        {{ "main.js" | asset_url | script_tag }}
+    </body>
+</html>
