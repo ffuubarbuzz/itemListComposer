@@ -33,7 +33,7 @@
 
 			var lastSelected;	//for shift-click range selection
 
-			var dragEntered = false;	//fix for handling itemReceiver dragleave event
+			var dragEnteredItem = null;	//fix for handling itemReceiver dragleave event
 
 			var draggedItems = $([]);
 
@@ -48,7 +48,7 @@
 					e.preventDefault();
 					// console.log(e.dataTransfer);//.dropEffect = 'move';
 					// var mouseY = (event.pageY - $(this).offset().top);
-					var mouseY = e.originalEvent.layerY;
+					var mouseY = e.originalEvent.offsetY;
 					console.log(e.originalEvent.pageX);
 					if (mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
 						removeAcceptors();
@@ -79,6 +79,13 @@
 				}
 			});
 
+			var node = itemReceiver[0];
+			['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'].forEach(function(name){
+				node.addEventListener(name, function(e){
+					console.log(name, e.target);
+				});
+			});
+
 			// selectinging by click
 			itemSource.add(itemReceiver).find(settings.item).click(function(e){
 				if(e.shiftKey && undefined != lastSelected) {
@@ -105,18 +112,21 @@
 			});
 
 			itemReceiver.on('dragleave', function(e){
-				if( !dragEntered || e.target === this ) {
+				// console.log(e)
+				if( !dragEnteredItem || (e.target === this && !$(dragEnteredItem).hasClass(settings.acceptorClass) ) ) {
 					removeAcceptors();
 				}
-				dragEntered = false;
+				dragEnteredItem = null;
 			}).on('dragenter', function(e){
-				dragEntered = true;
+				dragEnteredItem = e.target;
 				if( e.target === this ) {
 					var last = $(this).find(settings.item).last();
 					if( !last.hasClass(settings.acceptorClass) ) {
 						last.after(newAcceptor());
 					}
 				}
+			}).on('dragover', function(e){
+				e.preventDefault();
 			}).on('drop', function(e){
 				e.preventDefault();
 				var acceptor = $(this).find('.'+settings.acceptorClass);
