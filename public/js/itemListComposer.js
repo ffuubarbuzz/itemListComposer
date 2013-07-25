@@ -1,8 +1,8 @@
 (function( $ ) {
 	$.fn.itemListComposer = function( options ) {
 		var settings = $.extend({
-			itemsSource: ".source",
-			itemReceivers: ".receiver",
+			itemSource: ".source",
+			itemReceiver: ".receiver",
 			item: 'li',
 			selectitem: '.select',
 			selectAllitems: '.select-all',
@@ -12,14 +12,15 @@
 			shiftDownButton: '.order-down',
 			acceptorTemplate: '#acceptor',
 			acceptorClass: 'acceptor',
-			selectedClass: 'selected'
+			selectedClass: 'selected',
+			draggedClass: 'dragged'
 		}, options );
 		
 		return this.each(function() {
 
 			//grabbing objects
-			var itemsSource = $(this).find(settings.itemsSource);
-			var itemReceivers = $(this).find(settings.itemReceivers);
+			var itemSource = $(this).find(settings.itemSource);
+			var itemReceiver = $(this).find(settings.itemReceiver);
 			var selectitem = $(this).find(settings.selectitem);
 			var selectAllitems = $(this).find(settings.selectAllitems);
 			var deselectitem = $(this).find(settings.deselectitem);
@@ -32,16 +33,54 @@
 
 			var lastSelected;	//for shift-click range selection
 
-			var enteredItem = false;
+			var dragEntered = false;	//fix for handling itemReceiver dragleave event
 
-			//initializing:
-			//sorting itemsSource
-			itemsSource.append(itemsSource.find(settings.item).sort(function(a, b) {
+			var draggedItems = $([]);
+
+			// behaviour objects for itemSource item and itemReceiver item
+			// so we can swap item behavior easily when moved from one container to another
+			sourceItemBehavior = {
+
+			}
+
+			var receiverItemBehavior = {
+				'dragover' : function(e) {
+					e.preventDefault();
+					// console.log(e.dataTransfer);//.dropEffect = 'move';
+					// var mouseY = (event.pageY - $(this).offset().top);
+					var mouseY = e.originalEvent.layerY;
+					console.log(e.originalEvent.pageX);
+					if (mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
+						removeAcceptors();
+						$(this).before(newAcceptor());
+					}
+					else if (mouseY > $(this).outerHeight() / 2 && !$(this).next().hasClass(settings.acceptorClass)){
+						removeAcceptors();
+						$(this).after(newAcceptor());
+					}
+				}
+			}
+
+			//
+			//	INITIALIZING:
+			// 
+
+			// sorting itemSource
+			itemSource.append(itemSource.find(settings.item).sort(function(a, b) {
 				return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 			}));
+			
+			// initial behavior for items
+			itemReceiver.find(settings.item).each(function(){
+				for(var e in receiverItemBehavior) {
+					if(receiverItemBehavior.hasOwnProperty(e)) {
+						$(this).on(e, receiverItemBehavior[e]);
+					}
+				}
+			});
 
 			// selectinging by click
-			itemsSource.add(itemReceivers).find(settings.item).click(function(e){
+			itemSource.add(itemReceiver).find(settings.item).click(function(e){
 				if(e.shiftKey && undefined != lastSelected) {
 					var lower = Math.min($(this).index(),lastSelected.index());
 					var upper = Math.max($(this).index(),lastSelected.index());
@@ -52,73 +91,70 @@
 					$(this).toggleClass(settings.selectedClass);
 				}
 				lastSelected = $(this);
-			}).on('dragstart', function(){
-				
+			}).on('dragstart', function(e){
+				var container = $(this).parents(settings.itemSource);
+				if( !container.length ) {
+					container = $(this).parents(settings.itemReceiver)
+				}
+				draggedItems = container.find('.'+settings.selectedClass);
+				draggedItems.addClass(settings.draggedClass);
+				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF')
 			}).on('dragend', function(){
-				removeAcceptors();
+				// removeAcceptors();
+				draggedItems.removeClass(settings.draggedClass);
 			});
 
-			// TODO: make different behaviour objects for itemSource item and itemReceivers item
-			// so we can swap item behavior easily when moved from one container to another
-
-			itemReceivers.on('dragover', function(){
-			}).on('dragleave', function(e){
-				if(!enteredItem) {
+			itemReceiver.on('dragleave', function(e){
+				if( !dragEntered || e.target === this ) {
 					removeAcceptors();
 				}
-				enteredItem = false;
+				dragEntered = false;
 			}).on('dragenter', function(e){
-				enteredItem = true;
-				if(e.target === this) {
+				dragEntered = true;
+				if( e.target === this ) {
 					var last = $(this).find(settings.item).last();
 					if( !last.hasClass(settings.acceptorClass) ) {
 						last.after(newAcceptor());
 					}
 				}
-			});
-
-			itemReceivers.find(settings.item).on('dragover', function(e){
-				var mouseY = (event.pageY - $(this).offset().top);
-				if (mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
-					removeAcceptors();
-					$(this).before(newAcceptor());
-				}
-				else if (mouseY > $(this).outerHeight() / 2 && !$(this).next().hasClass(settings.acceptorClass)){
-					removeAcceptors();
-					$(this).after(newAcceptor());
-				}
+			}).on('drop', function(e){
+				e.preventDefault();
+				var acceptor = $(this).find('.'+settings.acceptorClass);
+				console.log(acceptor)
+				//removeAcceptors();
+				acceptor.replaceWith(draggedItems);
 			});
 
 			selectitem.click(function(){
-				var items = itemsSource.find(settings.item + '.'+settings.selectedClass);
-				moveItems(items, itemReceivers)
+				var items = itemSource.find(settings.item + '.'+settings.selectedClass);
+				moveItems(items, itemReceiver)
 			});
 
 			selectAllitems.click(function(){
-				var items = itemsSource.find(settings.item);
+				var items = itemSource.find(settings.item);
 				items.addClass(settings.selectedClass);
-				moveItems(items, itemReceivers);
+				moveItems(items, itemReceiver);
 			});
 
 			deselectitem.click(function(){
-				var items = itemReceivers.find(settings.item + '.'+settings.selectedClass);
-				moveItems(items, itemsSource, true);
+				var items = itemReceiver.find(settings.item + '.'+settings.selectedClass);
+				moveItems(items, itemSource, true);
 			});
 
 			deselectAllitems.click(function(){
-				var items = itemReceivers.find(settings.item);
+				var items = itemReceiver.find(settings.item);
 				items.addClass(settings.selectedClass);
-				moveItems(items, itemsSource, true);
+				moveItems(items, itemSource, true);
 			});
 
 			shiftUpButton.click(function(){
-				itemReceivers.find(settings.item + '.'+settings.selectedClass).each(function(){
+				itemReceiver.find(settings.item + '.'+settings.selectedClass).each(function(){
 					shiftUp($(this));
 				});
 			});
 
 			shiftDownButton.click(function(){
-				$(itemReceivers.find(settings.item + '.'+settings.selectedClass).get().reverse()).each(function(){
+				$(itemReceiver.find(settings.item + '.'+settings.selectedClass).get().reverse()).each(function(){
 					shiftDown($(this));
 				});
 			});
@@ -135,8 +171,8 @@
 				else {
 					recepient.append(items);
 				}
-				itemsSource = $(that).find(settings.itemsSource);
-				itemReceivers = $(that).find(settings.itemReceivers);
+				itemSource = $(that).find(settings.itemSource);
+				itemReceiver = $(that).find(settings.itemReceiver);
 			}
 
 			function shiftUp(item) {
@@ -154,7 +190,7 @@
 			}
 
 			function removeAcceptors() {
-				itemReceivers.find('.'+settings.acceptorClass).remove();
+				itemReceiver.find('.'+settings.acceptorClass).remove();
 			}
 
 			function newAcceptor() {

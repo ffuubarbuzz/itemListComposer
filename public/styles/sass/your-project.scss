@@ -260,4 +260,7 @@ $lighter-yellow: #fff7e8;
 	.acceptor {
 		background: red;
 	}
+	.dragged {
+		@include opacity(.5);
+	}
 }

@@ -224,3 +224,7 @@ body {
 .double-list .acceptor {
   background: red;
 }
+.double-list .dragged {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
+  opacity: 0.5;
+}
