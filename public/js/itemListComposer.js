@@ -152,10 +152,13 @@
 			}).on('drop', function(e){
 				e.preventDefault();
 				var acceptor = $(this).find('.'+settings.acceptorClass);
-				var target = $(this).is(settings.itemSource) ? itemSource : itemReceiver;
-				moveItems(draggedItems, target);
-				console.log(target)
-				acceptor.replaceWith(draggedItems);
+				moveItems(draggedItems, $(this));
+				if($(this).is(settings.itemReceiver)) {
+					acceptor.replaceWith(draggedItems);
+				}
+				else {
+					removeAcceptors($(this));
+				}
 			});
 
 			selectItem.click(function(){
@@ -194,7 +197,6 @@
 
 
 			function moveItems(items, recipient) {
-				// removeAcceptors(recipient);
 				if( recipient.is(settings.itemSource) ) {
 					//sorting, if moving to itemsource
 					var clone = recipient.clone(true);
@@ -248,6 +250,7 @@
 
 			function removeAcceptors(container) {
 				container.find('.'+settings.acceptorClass).remove();
+				console.log(container.find('.'+settings.acceptorClass));
 			}
 
 			function newAcceptor() {
