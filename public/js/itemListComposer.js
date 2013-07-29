@@ -203,32 +203,12 @@
 					clone.append(clone.append(items).find(settings.item).sort(function(a, b) {
 						return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 					}));
-					//swapping item behaviour
-					items.each(function(){
-						for(var e in receiverItemBehavior) {
-							$(this).off(e);
-						}
-						for(var e in sourceItemBehavior) {
-							$(this).on(e, sourceItemBehavior[e]);
-						}
-					});
-
 					recipient.replaceWith(clone);
+					swapItemsBehaviour(items);
 				}
 				else {
-					//swapping item behaviour
-					items.each(function(){
-						console.log(sourceItemBehavior)
-						for(var e in sourceItemBehavior) {
-							console.log(e);
-							$(this).off(e);
-						}
-						for(var e in receiverItemBehavior) {
-							$(this).on(e, receiverItemBehavior[e]);
-						}
-					});
-
 					recipient.append(items);
+					swapItemsBehaviour(items);
 				}
 				itemSource = $(that).find(settings.itemSource);
 				itemReceiver = $(that).find(settings.itemReceiver);
@@ -250,11 +230,30 @@
 
 			function removeAcceptors(container) {
 				container.find('.'+settings.acceptorClass).remove();
-				console.log(container.find('.'+settings.acceptorClass));
 			}
 
 			function newAcceptor() {
 				return acceptorTemplate.clone();
+			}
+
+			function swapItemsBehaviour(items) {
+				items.each(function(){
+					// assume that items are already in new container and it is itemSource
+					var fromBehavior = receiverItemBehavior;
+					var toBehavior = sourceItemBehavior;
+					var container = $(this).parents(settings.itemSource);
+					if( !container.length ) {
+						// container is itemReceiver
+						fromBehavior = sourceItemBehavior;
+						toBehavior = receiverItemBehavior;
+					}
+					for(var e in fromBehavior) {
+						$(this).off(e);
+					}
+					for(var e in toBehavior) {
+						$(this).on(e, receiverItemBehavior[e]);
+					}
+				});
 			}
 		});
 };

@@ -16,8 +16,6 @@ D:\testroom\itemListComposer\public\js\itemListComposer.js: line 126, col 6, Mix
 D:\testroom\itemListComposer\public\js\itemListComposer.js: line 128, col 6, Mixed spaces and tabs.
 D:\testroom\itemListComposer\public\js\itemListComposer.js: line 129, col 6, Mixed spaces and tabs.
 D:\testroom\itemListComposer\public\js\itemListComposer.js: line 166, col 47, Missing semicolon.
-D:\testroom\itemListComposer\public\js\itemListComposer.js: line 211, col 35, 'e' is already defined.
-D:\testroom\itemListComposer\public\js\itemListComposer.js: line 221, col 56, Missing semicolon.
-D:\testroom\itemListComposer\public\js\itemListComposer.js: line 226, col 35, 'e' is already defined.
+D:\testroom\itemListComposer\public\js\itemListComposer.js: line 253, col 31, 'e' is already defined.
 
-21 errors
+19 errors
