@@ -89,6 +89,9 @@ body {
   border-top-color: #d7b0e5;
   font-weight: bold;
 }
+.double-list .sortable .list.droppable {
+  border-color: red;
+}
 .double-list .actions {
   vertical-align: middle;
   list-style: none;
@@ -227,7 +230,4 @@ body {
 .double-list .dragged {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
   opacity: 0.5;
-}
-.double-list .droppable {
-  border-color: red;
 }

@@ -136,6 +136,9 @@ $lighter-yellow: #fff7e8;
 				border-top-color: $lightest-violet;
 				font-weight: bold;
 			}
+			&.droppable {
+				border-color: red;
+			}
 		}
 	}
 	.actions {
@@ -262,8 +265,5 @@ $lighter-yellow: #fff7e8;
 	}
 	.dragged {
 		@include opacity(.5);
-	}
-	.droppable {
-		border-color: red;
 	}
 }

@@ -13,7 +13,8 @@
 			acceptorTemplate: '#acceptor',
 			acceptorClass: 'acceptor',
 			selectedClass: 'selected',
-			draggedClass: 'dragged'
+			draggedClass: 'dragged',
+			droppableClass: 'droppable'
 		}, options );
 		
 		return this.each(function() {
@@ -102,15 +103,15 @@
 				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF')
 			}).on('dragend', function(){
 				draggedItems.removeClass(settings.draggedClass);
+				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
 			});
 
 			// containers behaviour
 			itemReceiver.add(itemSource).on('dragleave', function(e){
-				if( !dragEnteredElement ) {
+				if( !dragEnteredElement  || 
+					(e.target === this && !$(dragEnteredElement).hasClass(settings.acceptorClass)) ) {
 					removeAcceptors($(this));
-				}
-				else if ( (e.target === this && !$(dragEnteredElement).hasClass(settings.acceptorClass)) ) {
-					removeAcceptors($(this));
+					$(this).removeClass(settings.droppableClass);
 				}
 				dragEnteredElement = null;
 			}).on('dragenter', function(e){
@@ -118,8 +119,10 @@
 				dragEnteredElement = e.target;
 				var targetContainer = findContainer($(dragEnteredElement));
 				if( e.target === this  || targetContainer.is(settings.itemSource) ) {
-					var last = $(this).find(settings.item).last();
-					if( !last.hasClass(settings.acceptorClass) ) {
+					//TODO: don't do for itemSource's items when over itemSource
+					$(this).addClass(settings.droppableClass);
+					if( targetContainer.is(settings.itemReceiver) && !last.hasClass(settings.acceptorClass) ) {
+						var last = $(this).find(settings.item).last();
 						last.after(newAcceptor());
 					}
 				}
@@ -128,7 +131,6 @@
 			}).on('drop', function(e){
 				e.preventDefault();
 
-				//TODO: itemSource should get 'droppable' class instead of acceptor to indicate that it can accept dragged items
 				//TODO: don't show acceptor when dragged items are from itemSource and target is itemSource too
 				if( $(this).is(settings.itemSource) && findContainer(draggedItems.first()).is(settings.itemSource) ) {
 					removeAcceptors($(this));
