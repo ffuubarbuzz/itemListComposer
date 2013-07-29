@@ -1,0 +1,1 @@
+!function(e){if("content"in e.createElement("template"))return!1;for(var t,n,a,c,l=e.getElementsByTagName("template"),m=l.length,o=0;m>o;++o){for(t=l[o],n=t.childNodes,a=n.length,c=e.createDocumentFragment();n[0];)c.appendChild(n[0]);t.content=c}}(document);
