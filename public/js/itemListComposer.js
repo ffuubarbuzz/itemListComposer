@@ -33,17 +33,17 @@
 
 			var lastSelected;	//for shift-click range selection
 
-			var dragEnteredItem = null;	//fix for handling itemReceiver dragleave event
+			var dragEnteredElement = null;	//fix for handling itemReceiver dragleave event
 
 			var draggedItems = $([]);
 
 			// behaviour objects for itemSource item and itemReceiver item
-			// so we can swap item behavior easily when moved from one container to another
-			var sourceItemBehavior = {
-
+			// so we can swap item behaviour easily when moved from one container to another
+			var sourceItemBehaviour = {
+				
 			}
 
-			var receiverItemBehavior = {
+			var receiverItemBehaviour = {
 				'dragover' : function(e) {
 					e.preventDefault();
 					// console.log(e.dataTransfer);//.dropEffect = 'move';
@@ -69,23 +69,18 @@
 				return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 			}));
 			
-			// initial behavior for items
-			itemReceiver.find(settings.item).each(function(){
-				for(var e in receiverItemBehavior) {
-					if(receiverItemBehavior.hasOwnProperty(e)) {
-						$(this).on(e, receiverItemBehavior[e]);
-					}
-				}
-			});
+			// initial behaviour for items
+			setItemsBehaviour(itemReceiver.find(settings.item));
 
 			var node = itemReceiver[0];
 			['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'].forEach(function(name){
 				node.addEventListener(name, function(e){
 					// console.log(name, e.target);
-					// console.log(dragEnteredItem)
+					// console.log(dragEnteredElement)
 				});
 			});
 
+			// common for items behavior
 			// selectinging by click
 			itemSource.add(itemReceiver).find(settings.item).click(function(e){
 				if(e.shiftKey && undefined != lastSelected) {
@@ -99,49 +94,30 @@
 				}
 				lastSelected = $(this);
 			}).on('dragstart', function(e){
-				var container = $(this).parents(settings.itemSource);
-				if( !container.length ) {
-					container = $(this).parents(settings.itemReceiver)
-				}
-				draggedItems = container.find('.'+settings.selectedClass);
-				draggedItems.addClass(settings.draggedClass);
+				//TODO: prevent start dragging with small timeout and do click() instead
+				var container = findContainer($(this));
+				draggedItems = container.find('.'+settings.selectedClass).add($(this));
+				console.log(this)
+				draggedItems.addClass(settings.draggedClass + ' ' + settings.selectedClass);
 				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF')
 			}).on('dragend', function(){
 				draggedItems.removeClass(settings.draggedClass);
 			});
 
-			// containers behavior
-			// itemSource.on('dragover', function(e){
-			// 	e.preventDefault();
-			// }).on('dragenter', function(e){
-			// 	e.preventDefault();
-			// 	dragEnteredItem = e.target;
-			// 	if(e.target === this && !$(this).find(settings.acceptorClass).length) {
-			// 		$(this).append(newAcceptor());
-			// 	}
-			// }).on('dragleave', function(e){
-			// 	if( !dragEnteredItem || (e.target === this && !$(dragEnteredItem).hasClass(settings.acceptorClass)) ) {
-			// 		removeAcceptors(itemReceiver);
-			// 	}
-			// 	dragEnteredItem = null;
-			// }).on('drop', function(){
-			// 	removeAcceptors($(this));
-			// 	moveItems(draggedItems, itemSource);
-			// });
-
+			// containers behaviour
 			itemReceiver.add(itemSource).on('dragleave', function(e){
-				if( !dragEnteredItem ) {
-					// console.log('dragenterdItem')
+				if( !dragEnteredElement ) {
 					removeAcceptors($(this));
 				}
-				if ((e.target === this && !$(dragEnteredItem).hasClass(settings.acceptorClass))) {
-					// console.log('second condition')
+				else if ( (e.target === this && !$(dragEnteredElement).hasClass(settings.acceptorClass)) ) {
 					removeAcceptors($(this));
 				}
-				dragEnteredItem = null;
+				dragEnteredElement = null;
 			}).on('dragenter', function(e){
-				dragEnteredItem = e.target;
-				if( e.target === this ) {
+				//TODO: fix bug with hovering container border
+				dragEnteredElement = e.target;
+				var targetContainer = findContainer($(dragEnteredElement));
+				if( e.target === this  || targetContainer.is(settings.itemSource) ) {
 					var last = $(this).find(settings.item).last();
 					if( !last.hasClass(settings.acceptorClass) ) {
 						last.after(newAcceptor());
@@ -151,18 +127,26 @@
 				e.preventDefault();
 			}).on('drop', function(e){
 				e.preventDefault();
-				var acceptor = $(this).find('.'+settings.acceptorClass);
+
+				//TODO: itemSource should get 'droppable' class instead of acceptor to indicate that it can accept dragged items
+				//TODO: don't show acceptor when dragged items are from itemSource and target is itemSource too
+				if( $(this).is(settings.itemSource) && findContainer(draggedItems.first()).is(settings.itemSource) ) {
+					removeAcceptors($(this));
+					return;
+				}
+
+				var acceptor = $(this).find('.' + settings.acceptorClass);
 				moveItems(draggedItems, $(this));
 				if($(this).is(settings.itemReceiver)) {
 					acceptor.replaceWith(draggedItems);
 				}
 				else {
-					removeAcceptors($(this));
+					removeAcceptors(itemSource);
 				}
 			});
 
 			selectItem.click(function(){
-				var items = itemSource.find(settings.item + '.'+settings.selectedClass);
+				var items = itemSource.find(settings.item + '.' + settings.selectedClass);
 				moveItems(items, itemReceiver)
 			});
 
@@ -173,7 +157,7 @@
 			});
 
 			deselectItem.click(function(){
-				var items = itemReceiver.find(settings.item + '.'+settings.selectedClass);
+				var items = itemReceiver.find(settings.item + '.' + settings.selectedClass);
 				moveItems(items, itemSource);
 			});
 
@@ -184,13 +168,13 @@
 			});
 
 			shiftUpButton.click(function(){
-				itemReceiver.find(settings.item + '.'+settings.selectedClass).each(function(){
+				itemReceiver.find(settings.item + '.' + settings.selectedClass).each(function(){
 					shiftUp($(this));
 				});
 			});
 
 			shiftDownButton.click(function(){
-				$(itemReceiver.find(settings.item + '.'+settings.selectedClass).get().reverse()).each(function(){
+				$(itemReceiver.find(settings.item + '.' + settings.selectedClass).get().reverse()).each(function(){
 					shiftDown($(this));
 				});
 			});
@@ -204,11 +188,11 @@
 						return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 					}));
 					recipient.replaceWith(clone);
-					swapItemsBehaviour(items);
+					setItemsBehaviour(items);
 				}
 				else {
 					recipient.append(items);
-					swapItemsBehaviour(items);
+					setItemsBehaviour(items);
 				}
 				itemSource = $(that).find(settings.itemSource);
 				itemReceiver = $(that).find(settings.itemReceiver);
@@ -236,26 +220,33 @@
 				return acceptorTemplate.clone();
 			}
 
-			function swapItemsBehaviour(items) {
+			function setItemsBehaviour(items) {
 				items.each(function(){
 					// assume that items are already in new container and it is itemSource
-					var fromBehavior = receiverItemBehavior;
-					var toBehavior = sourceItemBehavior;
+					var fromBehaviour = receiverItemBehaviour;
+					var toBehaviour = sourceItemBehaviour;
 					var container = $(this).parents(settings.itemSource);
 					if( !container.length ) {
 						// container is itemReceiver
-						fromBehavior = sourceItemBehavior;
-						toBehavior = receiverItemBehavior;
+						fromBehaviour = sourceItemBehaviour;
+						toBehaviour = receiverItemBehaviour;
 					}
-					for(var e in fromBehavior) {
+					for(var e in fromBehaviour) {
 						$(this).off(e);
 					}
-					for(var e in toBehavior) {
-						$(this).on(e, receiverItemBehavior[e]);
+					for(var e in toBehaviour) {
+						$(this).on(e, receiverItemBehaviour[e]);
 					}
 				});
 			}
-		});
-};
 
+			function findContainer(item) {
+				var container = item.parents(settings.itemSource);
+				if( !container.length ) {
+					container = item.parents(settings.itemReceiver);
+				}
+				return container;
+			}
+		});
+	};
 }( jQuery ));

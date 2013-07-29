@@ -12,9 +12,7 @@
             {% block content %}{% endblock %}
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <!-- template -->
         {{ "templatePolyfill.js" | asset_url | script_tag }}
-        <!-- polyfill -->
         {{ "itemListComposer.js" | asset_url | script_tag }}
         {{ "main.js" | asset_url | script_tag }}
     </body>

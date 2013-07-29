@@ -263,4 +263,7 @@ $lighter-yellow: #fff7e8;
 	.dragged {
 		@include opacity(.5);
 	}
+	.droppable {
+		border-color: red;
+	}
 }

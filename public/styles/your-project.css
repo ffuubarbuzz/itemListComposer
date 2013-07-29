@@ -228,3 +228,6 @@ body {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
   opacity: 0.5;
 }
+.double-list .droppable {
+  border-color: red;
+}
