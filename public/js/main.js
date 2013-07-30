@@ -1,5 +1,3 @@
 $(document).ready(function(){
-	$('.double-list').itemListComposer({
-		selectedClass: 'checked'
-	});
+	$('.double-list').itemListComposer();
 });
