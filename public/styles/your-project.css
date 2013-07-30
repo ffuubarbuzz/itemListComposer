@@ -80,9 +80,14 @@ body {
   padding: 0 1em;
   height: 2em;
   line-height: 2em;
+  overflow: hidden;
 }
 .double-list .sortable .list li:first-child {
   border-top: none;
+}
+.double-list .sortable .list .acceptor {
+  height: .5em;
+  background: #dbdbdb;
 }
 .double-list .sortable .list .checked {
   background: #d7b0e5;
@@ -90,7 +95,7 @@ body {
   font-weight: bold;
 }
 .double-list .sortable .list.droppable {
-  border-color: red;
+  border-color: #74b1dc;
 }
 .double-list .actions {
   vertical-align: middle;
@@ -223,9 +228,6 @@ body {
 .lt-ie9 .double-list .action:active {
   *zoom: 1;
   filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FFE6E6E6', endColorstr='#FFDBDBDB');
-}
-.double-list .acceptor {
-  background: red;
 }
 .double-list .dragged {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);

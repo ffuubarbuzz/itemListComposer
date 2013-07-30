@@ -47,14 +47,13 @@
 			var receiverItemBehaviour = {
 				'dragover' : function(e) {
 					e.preventDefault();
-					// console.log(e.dataTransfer);//.dropEffect = 'move';
-					// var mouseY = (event.pageY - $(this).offset().top);
-					var mouseY = e.originalEvent.offsetY;
-					if (mouseY <= $(this).outerHeight() / 2 && !$(this).prev().hasClass(settings.acceptorClass)) {
+					var mouseY = (e.originalEvent.pageY - $(this).offset().top);
+					var itemHeight = $(this).outerHeight() / 2;
+					if (mouseY <= itemHeight && !$(this).prev().hasClass(settings.acceptorClass)) {
 						removeAcceptors(itemReceiver);
 						$(this).before(newAcceptor());
 					}
-					else if (mouseY > $(this).outerHeight() / 2 && !$(this).next().hasClass(settings.acceptorClass)){
+					else if (mouseY > itemHeight && !$(this).next().hasClass(settings.acceptorClass)){
 						removeAcceptors(itemReceiver);
 						$(this).after(newAcceptor());
 					}
@@ -73,13 +72,13 @@
 			// initial behaviour for items
 			setItemsBehaviour(itemReceiver.find(settings.item));
 
-			var node = itemReceiver[0];
-			['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'].forEach(function(name){
-				node.addEventListener(name, function(e){
-					// console.log(name, e.target);
-					// console.log(dragEnteredElement)
-				});
-			});
+			// var node = itemReceiver[0];
+			// ['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'].forEach(function(name){
+			// 	node.addEventListener(name, function(e){
+			// 		// console.log(name, e.target);
+			// 		// console.log(dragEnteredElement)
+			// 	});
+			// });
 
 			// common for items behavior
 			// selectinging by click
@@ -98,40 +97,46 @@
 				//TODO: prevent start dragging with small timeout and do click() instead
 				var container = findContainer($(this));
 				draggedItems = container.find('.'+settings.selectedClass).add($(this));
-				console.log(this)
 				draggedItems.addClass(settings.draggedClass + ' ' + settings.selectedClass);
 				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF')
 			}).on('dragend', function(){
 				draggedItems.removeClass(settings.draggedClass);
 				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
+			}).on('selectstart', function(){
+				//this is for ie9-
+				this.dragDrop(); return false;
 			});
 
 			// containers behaviour
 			itemReceiver.add(itemSource).on('dragleave', function(e){
-				if( !dragEnteredElement  || 
-					(e.target === this && !$(dragEnteredElement).hasClass(settings.acceptorClass)) ) {
-					removeAcceptors($(this));
+				if( !dragEnteredElement || dragEnteredElement === e.target ) {
 					$(this).removeClass(settings.droppableClass);
+					removeAcceptors($(this));
 				}
 				dragEnteredElement = null;
 			}).on('dragenter', function(e){
-				//TODO: fix bug with hovering container border
+				e.preventDefault();
 				dragEnteredElement = e.target;
-				var targetContainer = findContainer($(dragEnteredElement));
-				if( e.target === this  || targetContainer.is(settings.itemSource) ) {
-					//TODO: don't do for itemSource's items when over itemSource
-					$(this).addClass(settings.droppableClass);
-					if( targetContainer.is(settings.itemReceiver) && !last.hasClass(settings.acceptorClass) ) {
-						var last = $(this).find(settings.item).last();
+				var draggedItemsContainer = findContainer(draggedItems.first());
+				if( dragEnteredElement === this  && $(this).is(settings.itemReceiver) ) {
+					var last = $(this).find(settings.item).last();
+					if( !last.hasClass(settings.acceptorClass) ) {
+						removeAcceptors($(this));
 						last.after(newAcceptor());
 					}
+				}
+				if( draggedItemsContainer.is(settings.itemReceiver) || $(this).is(settings.itemReceiver) ) {
+					$(this).addClass(settings.droppableClass);
 				}
 			}).on('dragover', function(e){
 				e.preventDefault();
 			}).on('drop', function(e){
 				e.preventDefault();
 
-				//TODO: don't show acceptor when dragged items are from itemSource and target is itemSource too
+				//duplicationg for opera not firing dragend when it should
+				draggedItems.removeClass(settings.draggedClass);
+				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
+
 				if( $(this).is(settings.itemSource) && findContainer(draggedItems.first()).is(settings.itemSource) ) {
 					removeAcceptors($(this));
 					return;
@@ -154,7 +159,6 @@
 
 			selectAllitems.click(function(){
 				var items = itemSource.find(settings.item);
-				items.addClass(settings.selectedClass);
 				moveItems(items, itemReceiver);
 			});
 
@@ -165,7 +169,6 @@
 
 			deselectAllitems.click(function(){
 				var items = itemReceiver.find(settings.item);
-				items.addClass(settings.selectedClass);
 				moveItems(items, itemSource);
 			});
 
