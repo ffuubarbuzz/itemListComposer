@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>itemListComposer</title>
+        <link rel="stylesheet" href="public/styles/itemlistcomposer.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>paramListComposer test page</h1>
+            <div class="double-list">
+                <div class="sortable">
+                    <div class="title">Доступные параметры</div>
+                    <ul class="list source" id="export_params_all">
+                        <li draggable="true">Наименование товара</li>
+                        <li draggable="true">Стоимость товара</li>
+                        <li draggable="true">Последнее обновление</li>
+                        <li draggable="true" class="checked">Категория</li>
+                        <li draggable="true">Производитель</li>
+                        <li draggable="true">Программа</li>
+                        <li draggable="true">Описание</li>
+                        <li draggable="true">Площадка</li>
+                        <li draggable="true">Регион</li>
+                        <li draggable="true">Брэнд</li>
+                        <li draggable="true">Прибыль</li>
+                    </ul>
+                </div>
+                <ul class="actions move">
+                    <li><button type="button" class="action select">Выбрать</button></li>
+                    <li><button type="button" class="action select-all">Выбрать все</button></li>
+                    <li><button type="button" class="action deselect">Удалить</button></li>
+                    <li><button type="button" class="action deselect-all">Удалить все</button></li>
+                </ul>
+                <div class="sortable">
+                    <div class="title">Выбранные параметры</div>
+                    <ul class="list receiver" id="export_params_selected">
+                        <li draggable="true">Прогнозируемая цена</li>
+                        <li draggable="true">CPB</li>
+                        <li draggable="true">Время доставки товара</li>
+                        <li draggable="true">Цена доставки</li>
+                        <li draggable="true">Минимальный заказ</li>
+                    </ul>
+                </div>
+                <ul class="actions order">
+                    <li><button type="button" class="action order-up" title="Выше"></button></li>
+                    <li><button type="button" class="action order-down" title="Ниже"></button></li>
+                </ul>
+                <template id="acceptor">
+                    <li class="acceptor"></li>
+                </template>
+            </div>
+        </div>
+        <script src="public/js/vendor/jquery.1.10.2.min.js"></script>
+        <script src="public/js/templatePolyfill.min.js"></script>
+        <script src="public/js/itemListComposer.min.js"></script>
+        <script src="public/js/main.min.js"></script>
+    </body>
+</html>
