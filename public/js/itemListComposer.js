@@ -39,7 +39,7 @@
 
 			var draggedItems = $([]);
 
-			// behaviour objects for itemSource item and itemReceiver item
+			// behaviour objects for itemSource and itemReceiver items
 			// so we can swap item behaviour easily when moved from one container to another
 			var sourceItemBehaviour = {
 				
@@ -71,6 +71,13 @@
 			itemSource.append(itemSource.find(settings.item).sort(function(a, b) {
 				return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 			}));
+
+			// sorting itemReceiver if it isn't orderable
+			if( !settings.itemReceiverOrderable ) {
+			itemReceiver.append(itemReceiver.find(settings.item).sort(function(a, b) {
+				return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+			}));				
+			}
 			
 			// initial behaviour for items
 			setItemsBehaviour(itemReceiver.find(settings.item));
