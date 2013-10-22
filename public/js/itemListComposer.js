@@ -3,6 +3,7 @@
 		var settings = $.extend({
 			itemSource: ".source",
 			itemReceiver: ".receiver",
+			itemReceiverOrderable: true,
 			item: 'li',
 			selectItem: '.select',
 			selectAllitems: '.select-all',
@@ -49,13 +50,15 @@
 					e.preventDefault();
 					var mouseY = (e.originalEvent.pageY - $(this).offset().top);
 					var itemHeight = $(this).outerHeight() / 2;
-					if (mouseY <= itemHeight && !$(this).prev().hasClass(settings.acceptorClass)) {
-						removeAcceptors(itemReceiver);
-						$(this).before(newAcceptor());
-					}
-					else if (mouseY > itemHeight && !$(this).next().hasClass(settings.acceptorClass)){
-						removeAcceptors(itemReceiver);
-						$(this).after(newAcceptor());
+					if ( settings.itemReceiverOrderable ) {
+						if ( mouseY <= itemHeight && !$(this).prev().hasClass(settings.acceptorClass) ) {
+							removeAcceptors(itemReceiver);
+							$(this).before(newAcceptor());
+						}
+						else if ( mouseY > itemHeight && !$(this).next().hasClass(settings.acceptorClass) ){
+							removeAcceptors(itemReceiver);
+							$(this).after(newAcceptor());
+						}
 					}
 				}
 			};
@@ -120,7 +123,8 @@
 				var draggedItemsContainer = findContainer(draggedItems.first());
 				if( dragEnteredElement === this  && $(this).is(settings.itemReceiver) ) {
 					var last = $(this).find(settings.item).last();
-					if( !last.hasClass(settings.acceptorClass) ) {
+					if( !last.hasClass(settings.acceptorClass)
+						&& settings.itemReceiverOrderable ) {
 						removeAcceptors($(this));
 						last.after(newAcceptor());
 					}
@@ -144,7 +148,7 @@
 
 				var acceptor = $(this).find('.' + settings.acceptorClass);
 				moveItems(draggedItems, $(this));
-				if($(this).is(settings.itemReceiver)) {
+				if( $(this).is(settings.itemReceiver) && settings.itemReceiverOrderable) {
 					acceptor.replaceWith(draggedItems);
 				}
 				else {
@@ -172,22 +176,26 @@
 				moveItems(items, itemSource);
 			});
 
-			shiftUpButton.click(function(){
-				itemReceiver.find(settings.item + '.' + settings.selectedClass).each(function(){
-					shiftUp($(this));
+			if( settings.itemReceiverOrderable ) {
+				shiftUpButton.click(function(){
+					itemReceiver.find(settings.item + '.' + settings.selectedClass).each(function(){
+						shiftUp($(this));
+					});
 				});
-			});
 
-			shiftDownButton.click(function(){
-				$(itemReceiver.find(settings.item + '.' + settings.selectedClass).get().reverse()).each(function(){
-					shiftDown($(this));
+				shiftDownButton.click(function(){
+					$(itemReceiver.find(settings.item + '.' + settings.selectedClass).get().reverse()).each(function(){
+						shiftDown($(this));
+					});
 				});
-			});
+			}
+
 
 
 			function moveItems(items, recipient) {
-				if( recipient.is(settings.itemSource) ) {
-					//sorting, if moving to itemsource
+				if( recipient.is(settings.itemSource) ||
+					( recipient.is(settings.itemReceiver) && !settings.itemReceiverOrderable ) ) {
+					//sorting, if moving to itemsource or if itemreceiver isn't orderable
 					var clone = recipient.clone(true);
 					clone.append(clone.append(items).find(settings.item).sort(function(a, b) {
 						return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
