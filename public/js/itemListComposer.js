@@ -42,7 +42,7 @@
 			// so we can swap item behaviour easily when moved from one container to another
 			var sourceItemBehaviour = {
 				
-			}
+			};
 
 			var receiverItemBehaviour = {
 				'dragover' : function(e) {
@@ -58,7 +58,7 @@
 						$(this).after(newAcceptor());
 					}
 				}
-			}
+			};
 
 			//
 			//	INITIALIZING:
@@ -83,7 +83,7 @@
 			// common for items behavior
 			// selectinging by click
 			itemSource.add(itemReceiver).find(settings.item).click(function(e){
-				if(e.shiftKey && undefined != lastSelected) {
+				if(e.shiftKey && undefined !== lastSelected) {
 					var lower = Math.min($(this).index(),lastSelected.index());
 					var upper = Math.max($(this).index(),lastSelected.index());
 					var items = $(this).siblings().slice(lower, upper);
@@ -98,7 +98,7 @@
 				var container = findContainer($(this));
 				draggedItems = container.find('.'+settings.selectedClass).add($(this));
 				draggedItems.addClass(settings.draggedClass + ' ' + settings.selectedClass);
-				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF')
+				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF');
 			}).on('dragend', function(){
 				draggedItems.removeClass(settings.draggedClass);
 				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
@@ -154,7 +154,7 @@
 
 			selectItem.click(function(){
 				var items = itemSource.find(settings.item + '.' + settings.selectedClass);
-				moveItems(items, itemReceiver)
+				moveItems(items, itemReceiver);
 			});
 
 			selectAllitems.click(function(){
