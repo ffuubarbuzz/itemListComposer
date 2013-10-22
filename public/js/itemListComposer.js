@@ -141,8 +141,15 @@
 				draggedItems.removeClass(settings.draggedClass);
 				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
 
-				if( $(this).is(settings.itemSource) && findContainer(draggedItems.first()).is(settings.itemSource) ) {
-					removeAcceptors($(this));
+				if( $(this).is(settings.itemSource) 
+					&& findContainer(draggedItems.first()).is(settings.itemSource) ) {
+					// removeAcceptors($(this));
+					return;
+				}
+
+				if( $(this).is(settings.itemReceiver) 
+					&& findContainer(draggedItems.first()).is(settings.itemReceiver)
+					&& !settings.itemReceiverOrderable ) {
 					return;
 				}
 
