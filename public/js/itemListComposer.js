@@ -15,7 +15,9 @@
 			acceptorClass: 'acceptor',
 			selectedClass: 'selected',
 			draggedClass: 'dragged',
-			droppableClass: 'droppable'
+			droppableClass: 'droppable',
+			onSelect: function () {},
+			onDeselect: function () {}
 		}, options );
 		
 		return this.each(function() {
@@ -216,10 +218,12 @@
 					}));
 					recipient.replaceWith(clone);
 					setItemsBehaviour(items);
+					settings.onDeselect(items);
 				}
 				else {
 					recipient.append(items);
 					setItemsBehaviour(items);
+					settings.onSelect(items);
 				}
 				itemSource = $(that).find(settings.itemSource);
 				itemReceiver = $(that).find(settings.itemReceiver);
