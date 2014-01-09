@@ -41,6 +41,10 @@
 
 			var draggedItems = $([]);
 
+			//remove all handlers so we can reinitialize the plugin
+			itemSource.add(itemReceiver).add(itemSource.find(settings.item)).add(itemReceiver.find(settings.item))
+			.off('.itemListComposer');
+
 			// behaviour objects for itemSource and itemReceiver items
 			// so we can swap item behaviour easily when moved from one container to another
 			var sourceItemBehaviour = {
@@ -48,7 +52,7 @@
 			};
 
 			var receiverItemBehaviour = {
-				'dragover' : function(e) {
+				'dragover.itemListComposer' : function(e) {
 					e.preventDefault();
 					var mouseY = (e.originalEvent.pageY - $(this).offset().top);
 					var itemHeight = $(this).outerHeight() / 2;
@@ -94,7 +98,7 @@
 
 			// common for items behavior
 			// selectinging by click
-			itemSource.add(itemReceiver).find(settings.item).click(function(e){
+			itemSource.add(itemReceiver).find(settings.item).on('click.itemListComposer', function(e){
 				if(e.shiftKey && undefined !== lastSelected) {
 					var lower = Math.min($(this).index(),lastSelected.index());
 					var upper = Math.max($(this).index(),lastSelected.index());
@@ -105,28 +109,28 @@
 					$(this).toggleClass(settings.selectedClass);
 				}
 				lastSelected = $(this);
-			}).on('dragstart', function(e){
+			}).on('dragstart.itemListComposer', function(e){
 				//TODO: prevent start dragging with small timeout and do click() instead
 				var container = findContainer($(this));
 				draggedItems = container.find('.'+settings.selectedClass).add($(this));
 				draggedItems.addClass(settings.draggedClass + ' ' + settings.selectedClass);
 				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF');
-			}).on('dragend', function(){
+			}).on('dragend.itemListComposer', function(){
 				draggedItems.removeClass(settings.draggedClass);
 				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
-			}).on('selectstart', function(){
+			}).on('selectstart.itemListComposer', function(){
 				//this is for ie9-
 				this.dragDrop(); return false;
 			});
 
 			// containers behaviour
-			itemReceiver.add(itemSource).on('dragleave', function(e){
+			itemReceiver.add(itemSource).on('dragleave.itemListComposer', function(e){
 				if( !dragEnteredElement || dragEnteredElement === e.target ) {
 					$(this).removeClass(settings.droppableClass);
 					removeAcceptors($(this));
 				}
 				dragEnteredElement = null;
-			}).on('dragenter', function(e){
+			}).on('dragenter.itemListComposer', function(e){
 				e.preventDefault();
 				dragEnteredElement = e.target;
 				var draggedItemsContainer = findContainer(draggedItems.first());
@@ -141,9 +145,9 @@
 				if( draggedItemsContainer.is(settings.itemReceiver) || $(this).is(settings.itemReceiver) ) {
 					$(this).addClass(settings.droppableClass);
 				}
-			}).on('dragover', function(e){
+			}).on('dragover.itemListComposer', function(e){
 				e.preventDefault();
-			}).on('drop', function(e){
+			}).on('drop.itemListComposer', function(e){
 				e.preventDefault();
 
 				//duplicationg for opera not firing dragend when it should
@@ -172,34 +176,34 @@
 				}
 			});
 
-			selectItem.click(function(){
+			selectItem.on('click.itemListComposer', function(){
 				var items = itemSource.find(settings.item + '.' + settings.selectedClass);
 				moveItems(items, itemReceiver);
 			});
 
-			selectAllitems.click(function(){
+			selectAllitems.on('click.itemListComposer', function(){
 				var items = itemSource.find(settings.item);
 				moveItems(items, itemReceiver);
 			});
 
-			deselectItem.click(function(){
+			deselectItem.on('click.itemListComposer', function(){
 				var items = itemReceiver.find(settings.item + '.' + settings.selectedClass);
 				moveItems(items, itemSource);
 			});
 
-			deselectAllitems.click(function(){
+			deselectAllitems.on('click.itemListComposer', function(){
 				var items = itemReceiver.find(settings.item);
 				moveItems(items, itemSource);
 			});
 
 			if( settings.itemReceiverOrderable ) {
-				shiftUpButton.click(function(){
+				shiftUpButton.on('click.itemListComposer', function(){
 					itemReceiver.find(settings.item + '.' + settings.selectedClass).each(function(){
 						shiftUp($(this));
 					});
 				});
 
-				shiftDownButton.click(function(){
+				shiftDownButton.on('click.itemListComposer', function(){
 					$(itemReceiver.find(settings.item + '.' + settings.selectedClass).get().reverse()).each(function(){
 						shiftDown($(this));
 					});
@@ -266,7 +270,7 @@
 						$(this).off(e);
 					}
 					for(var e in toBehaviour) {
-						$(this).on(e, receiverItemBehaviour[e]);
+						$(this).on(e+'.itemListComposer', receiverItemBehaviour[e]);
 					}
 				});
 			}
