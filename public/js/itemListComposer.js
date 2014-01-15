@@ -6,9 +6,9 @@
 			itemReceiverOrderable: true,
 			item: 'li',
 			selectItem: '.select',
-			selectAllitems: '.select-all',
+			selectAllItems: '.select-all',
 			deselectItem: '.deselect',
-			deselectAllitems: '.deselect-all',
+			deselectAllItems: '.deselect-all',
 			shiftUpButton: '.order-up',
 			shiftDownButton: '.order-down',
 			acceptorTemplate: '#acceptor',
@@ -26,9 +26,9 @@
 			var itemSource = $(this).find(settings.itemSource);
 			var itemReceiver = $(this).find(settings.itemReceiver);
 			var selectItem = $(this).find(settings.selectItem);
-			var selectAllitems = $(this).find(settings.selectAllitems);
+			var selectAllItems = $(this).find(settings.selectAllItems);
 			var deselectItem = $(this).find(settings.deselectItem);
-			var deselectAllitems = $(this).find(settings.deselectAllitems);
+			var deselectAllItems = $(this).find(settings.deselectAllItems);
 			var shiftUpButton = $(this).find(settings.shiftUpButton);
 			var shiftDownButton = $(this).find(settings.shiftDownButton);
 			var acceptorTemplate = $($(this).find(settings.acceptorTemplate).get(0).content);
@@ -42,8 +42,12 @@
 			var draggedItems = $([]);
 
 			//remove all handlers so we can reinitialize the plugin
-			itemSource.add(itemReceiver).add(itemSource.find(settings.item)).add(itemReceiver.find(settings.item))
-			.off('.itemListComposer');
+			itemSource.add(itemReceiver)
+			.add(itemSource.find(settings.item))
+			.add(itemReceiver.find(settings.item))
+			.add(selectItem).add(deselectItem)
+			.add(selectAllItems).add(deselectAllItems)
+			.add(shiftUpButton).add(shiftDownButton).off('.itemListComposer');
 
 			// behaviour objects for itemSource and itemReceiver items
 			// so we can swap item behaviour easily when moved from one container to another
@@ -181,7 +185,7 @@
 				moveItems(items, itemReceiver);
 			});
 
-			selectAllitems.on('click.itemListComposer', function(){
+			selectAllItems.on('click.itemListComposer', function(){
 				var items = itemSource.find(settings.item);
 				moveItems(items, itemReceiver);
 			});
@@ -191,7 +195,7 @@
 				moveItems(items, itemSource);
 			});
 
-			deselectAllitems.on('click.itemListComposer', function(){
+			deselectAllItems.on('click.itemListComposer', function(){
 				var items = itemReceiver.find(settings.item);
 				moveItems(items, itemSource);
 			});
