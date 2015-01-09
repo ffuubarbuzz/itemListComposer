@@ -118,7 +118,10 @@
 				var container = findContainer($(this));
 				draggedItems = container.find('.'+settings.selectedClass).add($(this));
 				draggedItems.addClass(settings.draggedClass + ' ' + settings.selectedClass);
-				e.originalEvent.dataTransfer.setData('text/plain', 'Dragndrop now works in stinky bastard FF');
+				var dragData = draggedItems.map(function(){
+					return this.innerText;
+				}).get().join(', ');
+				e.originalEvent.dataTransfer.setData('text/plain', dragData);
 			}).on('dragend.itemListComposer', function(){
 				draggedItems.removeClass(settings.draggedClass);
 				itemReceiver.add(itemSource).removeClass(settings.droppableClass);
